@@ -1,0 +1,12 @@
+{
+  "name": "equation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./test.js",
+    "jshint": "jshint *.js"
+  },
+  "author": "Marko Raatikka",
+  "license": "MIT"
+}
