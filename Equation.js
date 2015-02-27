@@ -12,8 +12,9 @@ function Equation(values, operand) {
   this.operand = operand;
 
 }
+
 /**
- * Supported operands
+ * Operand operations
  */
 Equation.prototype.operations = {
   '^': function (a, b) { return Math.pow(a, b); },
@@ -44,3 +45,8 @@ Equation.prototype.compute = function () {
 };
 
 module.exports = Equation;
+
+/**
+ * Supported operands
+ */
+module.exports.SUPPORTED_OPERANDS = [ '+', '-', '*', '/' , '%', '^' ];

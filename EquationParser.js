@@ -2,8 +2,6 @@
 
 var Equation = require('./Equation');
 
-var SUPPORTED_OPERANDS = [ '+', '-', '*', '/' , '%', '^' ];
-
 function EquationParser() {}
 
 /**
@@ -19,7 +17,7 @@ function parseEquation(equationStr, operands) {
 
   var subEquations, operand, values;
 
-  operands = operands ? operands.slice() : SUPPORTED_OPERANDS.slice();
+  operands = operands ? operands.slice() : Equation.SUPPORTED_OPERANDS.slice();
 
   // Split the equation string into strings of sub-equations
   while ((operand = operands.shift()) !== undefined) {
