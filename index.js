@@ -12,13 +12,13 @@
 
 var EquationParser = require('./EquationParser');
 
-var EquationParser = new EquationParser();
+var equationParser = new EquationParser();
 var equationStr = process.argv[2];
 
 if (!equationStr) {
   return console.log('Usage: ./index.js 1+2-3*4/5%6^7');
 }
 
-var equation = EquationParser.parseEquation(equationStr);
+var equation = equationParser.parseEquation(equationStr);
 
 console.log(equation.compute());
