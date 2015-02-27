@@ -1,5 +1,24 @@
 'use strict';
 
+/**
+ * Represents a string-based equation as a tree of values & operands.
+ * For example,
+ *
+ *            5*3-2+1-3
+ *                |
+ *                +
+ *             /     \
+ *          5*3-2    1-3
+ *            |       |
+ *            -       -
+ *          /   \    / \
+ *        5*3    2  1   3
+ *         |
+ *         *
+ *        / \
+ *       5   3
+ */
+
 var Equation = require('./Equation');
 
 function EquationParser() {}
