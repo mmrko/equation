@@ -25,7 +25,7 @@ function EquationParser() {}
 
 /**
  * Parses the string representation of an equation into an Equation instance
- * consisting of integers and/or toher Equation instances
+ * consisting of integers and/or other Equation instances
  * @param  {String} equationStr A string representation of an equation
  * @param  {Array} operands     A string array of operands to process
  * @return {Equation}           An Equation instance
