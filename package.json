@@ -8,5 +8,8 @@
     "jshint": "jshint *.js"
   },
   "author": "Marko Raatikka",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jshint": "^2.6.2"
+  }
 }
