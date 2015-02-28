@@ -20,6 +20,7 @@
  */
 
 var Equation = require('./Equation');
+var SUPPORTED_OPERANDS = Equation.SUPPORTED_OPERANDS;
 
 function EquationParser() {}
 
@@ -36,7 +37,7 @@ function parseEquation(equationStr, operands) {
 
   var subEquations, operand, values;
 
-  operands = operands ? operands.slice() : Equation.SUPPORTED_OPERANDS.slice();
+  operands = operands ? operands.slice() : SUPPORTED_OPERANDS.slice();
 
   // Split the equation string into strings of sub-equations
   while ((operand = operands.shift()) !== undefined) {
@@ -60,6 +61,17 @@ function parseEquation(equationStr, operands) {
 
 }
 
+EquationParser.prototype.validateEquation = function(equationStr) {
+
+  var regexStr = '[^\\d\\' + SUPPORTED_OPERANDS.join('\\') + ']';
+  var validationRegex = new RegExp(regexStr, 'gi');
+
+  if (validationRegex.test(equationStr)) {
+    throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS.join(', '));
+  }
+
+};
+
 /**
  * Checks if a given string contains any non-numerical characters
  * @param  {String}  equationStr A string representation of an equation
@@ -80,6 +92,8 @@ EquationParser.prototype.parseEquation = function (equationStr) {
 
   // Strip whitespace
   equationStr = equationStr.replace(/\s+/g, '');
+
+  this.validateEquation(equationStr)
 
   return parseEquation.call(this, equationStr);
 

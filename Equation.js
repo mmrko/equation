@@ -14,15 +14,15 @@ function Equation(values, operand) {
 }
 
 /**
- * Operand operations
+ * Operand operations (in order of precedence)
  */
 Equation.prototype.operations = {
-  '^': function (a, b) { return Math.pow(a, b); },
-  '%': function (a, b) { return a % b; },
-  '/': function (a, b) { return a / b; },
-  '*': function (a, b) { return a * b; },
+  '+': function (a, b) { return a + b; },
   '-': function (a, b) { return a - b; },
-  '+': function (a, b) { return a + b; }
+  '%': function (a, b) { return a % b; },
+  '*': function (a, b) { return a * b; },
+  '/': function (a, b) { return a / b; },
+  '^': function (a, b) { return Math.pow(a, b); }
 };
 
 Equation.prototype.getOperation = function () {
@@ -48,5 +48,8 @@ module.exports = Equation;
 
 /**
  * Supported operands
+ *
+ * @borrows Uses keys from Equation.prototype.operations
+ * @see     Equation.prototype.operations
  */
-module.exports.SUPPORTED_OPERANDS = [ '+', '-', '*', '/' , '%', '^' ];
+module.exports.SUPPORTED_OPERANDS = Object.keys(Equation.prototype.operations);
