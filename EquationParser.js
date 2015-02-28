@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Represents a string-based equation as a tree of values & operands.
- * For example,
+ * Parses a string-based equation into a tree of values & operands.
+ * For example, the equation 5*3-2+1-3 becomes:
  *
  *            5*3-2+1-3
  *                |
@@ -61,6 +61,15 @@ function parseEquation(equationStr, operands) {
 
 }
 
+/**
+ * Validates a given equation string by checking that it
+ * contains only numbers and/or supported operands
+ *
+ * @param  {String} equationStr
+ * @throws {Error}  Throws an Error if the input is invalid
+ *
+ * @todo Check for invalid use of operands (e.g. 1++2)
+ */
 EquationParser.prototype.validateEquation = function(equationStr) {
 
   var regexStr = '[^\\d\\' + SUPPORTED_OPERANDS.join('\\') + ']';
@@ -73,7 +82,8 @@ EquationParser.prototype.validateEquation = function(equationStr) {
 };
 
 /**
- * Checks if a given string contains any non-numerical characters
+ * Checks if a given string contains any non-numerical characters (that is, operands)
+ *
  * @param  {String}  equationStr A string representation of an equation
  * @return {Boolean}             True if non-numerical characters exist, otherwise false
  */
@@ -82,11 +92,13 @@ EquationParser.prototype.hasOperands = function (equationStr) {
 };
 
 /**
- * Strips input for whitespace before passing it to the private implementation of parseEquation
+ * An overload of parseEquation().
+ * Strips whitespace & validates the input before passing it to parseEquation().
+ *
  * @param  {String}  equationStr A string representation of an equation
  * @return {Equation}            An Equation instance
  *
- * @todo  Implement a more thorough sanitization
+ * @see  parseEquation()
  */
 EquationParser.prototype.parseEquation = function (equationStr) {
 
