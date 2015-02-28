@@ -19,6 +19,10 @@ if (!equationStr) {
   return console.log('Usage: ./index.js 1+2-3*4/5%6^7');
 }
 
-var equation = equationParser.parseEquation(equationStr);
-
-console.log(equation.compute());
+try {
+  var equation = equationParser.parseEquation(equationStr);
+  var result = equation.compute();
+  console.log('Result:', result);
+} catch (e) {
+  console.error(e.message);
+}
