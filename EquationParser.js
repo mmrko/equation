@@ -2,7 +2,7 @@
 
 /**
  * Parses a string-based equation into a tree of operands & numbers/Equation instances.
- * 
+ *
  * For example, the equation 5*3-2+1-3 becomes:
  *
  *            5*3-2+1-3
@@ -53,7 +53,7 @@ function parseEquation(equationStr, operands) {
         return parseEquation.apply(this, [ subEquationStr, operands ]);
     }
     else {
-        return parseInt(subEquationStr, 10);
+        return parseFloat(subEquationStr, 10);
     }
 
   }, this);
@@ -73,23 +73,24 @@ function parseEquation(equationStr, operands) {
  */
 EquationParser.prototype.validateEquation = function(equationStr) {
 
-  var regexStr = '[^\\d\\' + SUPPORTED_OPERANDS.join('\\') + ']';
+  var regexStr = '[^\\d]{3,}|[^\\d\\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
   var validationRegex = new RegExp(regexStr, 'gi');
 
   if (validationRegex.test(equationStr)) {
+
     throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS.join(', '));
   }
 
 };
 
 /**
- * Checks if a given string contains any non-numerical characters (that is, operands)
+ * Checks if a given string contains characters that are nor numbers or dots (that is, operands)
  *
  * @param  {String}  equationStr A string representation of an equation
  * @return {Boolean}             True if non-numerical characters exist, otherwise false
  */
 EquationParser.prototype.hasOperands = function (equationStr) {
-  return /[^\d]/.test(equationStr);
+  return /[^\d\.]/.test(equationStr);
 };
 
 /**
