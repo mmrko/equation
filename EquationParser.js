@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * Parses a string-based equation into a tree of values & operands.
+ * Parses a string-based equation into a tree of operands & numbers/Equation instances.
+ * 
  * For example, the equation 5*3-2+1-3 becomes:
  *
  *            5*3-2+1-3
