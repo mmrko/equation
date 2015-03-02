@@ -10,7 +10,7 @@ var equationParser = new EquationParser();
 var parseEquationWithInvalidCharacters = equationParser.parseEquation.bind(equationParser, '1+a+2+b+3');
 var parseEquationWithInvalidDot = equationParser.parseEquation.bind(equationParser, '1+.-2');
 var eq1 = equationParser.parseEquation('2*6+5-2%2-5^3-1+1/5-1');
-var eq2 = equationParser.parseEquation('.5+2');
+var eq2 = equationParser.parseEquation('.5+2.');
 var eq3 = equationParser.parseEquation(' 1    + 2+ 4   /2   ');
 var eq4 = equationParser.parseEquation('2^2^3');
 

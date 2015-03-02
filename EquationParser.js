@@ -63,25 +63,45 @@ function parseEquation(equationStr, operands) {
 }
 
 /**
- * Validates a given equation string by checking that it
- * contains only numbers and/or supported operands
+ * Validates a given equation string by checking that it contains
+ * only numbers (integers or zero-padded floats) and/or supported operands
  *
  * @param  {String} equationStr
  * @throws {Error}  Throws an Error if the input is invalid
- *
- * @todo Check for invalid use of operands (e.g. 1++2)
  */
-EquationParser.prototype.validateEquation = function(equationStr) {
+function validateEquation(equationStr) {
 
-  var regexStr = '[^\\d]{3,}|[^\\d\\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
+  var regexStr = '[^\\d]{2,}|[^\\d\\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
   var validationRegex = new RegExp(regexStr, 'gi');
 
   if (validationRegex.test(equationStr)) {
-
     throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS.join(', '));
   }
 
 };
+
+/**
+ * Sanitizes the equation string:
+ *   - strip whitespace
+ *   - pad decimal points with missing zeros
+ *
+ * @param  {String} equationStr The equation
+ * @return {String}             A sanitized equation
+ */
+function sanitizeEquation(equationStr) {
+
+  return equationStr
+    // Strip whitespace
+    .replace(/\s+/g, '')
+    // Pad decimal points with zeros
+    .replace(/(\D)\.(\d)/g, function (m, p1, p2) {
+      return p1 + '0.' + p2;
+    })
+    .replace(/(\d)\.(\D)/g, function (m, p1, p2) {
+      return p1 + '.0' + p2;
+    });
+
+}
 
 /**
  * Checks if a given string contains characters that are nor numbers or dots (that is, operands)
@@ -104,10 +124,11 @@ EquationParser.prototype.hasOperands = function (equationStr) {
  */
 EquationParser.prototype.parseEquation = function (equationStr) {
 
-  // Strip whitespace
-  equationStr = equationStr.replace(/\s+/g, '');
+  // Sanitize
+  equationStr = sanitizeEquation(equationStr);
 
-  this.validateEquation(equationStr)
+  // Validate
+  validateEquation(equationStr)
 
   return parseEquation.call(this, equationStr);
 
