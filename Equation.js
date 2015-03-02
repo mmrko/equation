@@ -1,6 +1,18 @@
 'use strict';
 
 /**
+ * Operand operations (in order of precedence)
+ */
+var OPERATIONS = {
+  '+': function (a, b) { return a + b; },
+  '-': function (a, b) { return a - b; },
+  '%': function (a, b) { return a % b; },
+  '*': function (a, b) { return a * b; },
+  '/': function (a, b) { return a / b; },
+  '^': function (a, b) { return Math.pow(a, b); }
+};
+
+/**
  * Equation constructor
  *
  * @param {Array} values   An array of numbers and/or Equation instances
@@ -14,27 +26,11 @@ function Equation(values, operand) {
 }
 
 /**
- * Operand operations (in order of precedence)
- */
-Equation.prototype.operations = {
-  '+': function (a, b) { return a + b; },
-  '-': function (a, b) { return a - b; },
-  '%': function (a, b) { return a % b; },
-  '*': function (a, b) { return a * b; },
-  '/': function (a, b) { return a / b; },
-  '^': function (a, b) { return Math.pow(a, b); }
-};
-
-Equation.prototype.getOperation = function () {
-  return this.operations[this.operand];
-};
-
-/**
  * Computes the given equation recursively
  */
 Equation.prototype.compute = function () {
 
-  var operation = this.getOperation();
+  var operation = OPERATIONS[this.operand];
 
   return this.values.map(function (value) {
     return value instanceof Equation ? this.compute.call(value) : value;
@@ -49,7 +45,7 @@ module.exports = Equation;
 /**
  * Supported operands
  *
- * @borrows Uses keys from Equation.prototype.operations
- * @see     Equation.prototype.operations
+ * @borrows Uses keys from OPERATIONS
+ * @see     OPERATIONS
  */
-module.exports.SUPPORTED_OPERANDS = Object.keys(Equation.prototype.operations);
+module.exports.SUPPORTED_OPERANDS = Object.keys(OPERATIONS);
