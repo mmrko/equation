@@ -9,4 +9,4 @@ Supported operands: `+`, `-`, `/`, `*`, `%`, `^`
 * support parentheses
 * support power of power (e.g. `2^2^2`)
 * support unary operations (e.g. `sqrt` and `abs`)
-* improve input validation (e.g. check for invalid use of operands)
+* improve input validation (e.g. check for leading/trailing operand)
