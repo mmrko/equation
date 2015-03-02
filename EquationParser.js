@@ -22,6 +22,7 @@
 
 var Equation = require('./Equation');
 var SUPPORTED_OPERANDS = Equation.SUPPORTED_OPERANDS;
+var SUPPORTED_OPERANDS_REGEX = new RegExp('[\\' + SUPPORTED_OPERANDS.join('\\') + ']', 'gi');
 
 function EquationParser() {}
 
@@ -49,7 +50,7 @@ function parseEquation(equationStr, operands) {
   // Iterate over the sub-equations and call parseEquation recursively if the sub-equation contains operands
   values = subEquations.map(function (subEquationStr) {
 
-    if (this.hasOperands(subEquationStr)) {
+    if (hasOperands(subEquationStr)) {
         return parseEquation.apply(this, [ subEquationStr, operands ]);
     }
     else {
@@ -104,14 +105,15 @@ function sanitizeEquation(equationStr) {
 }
 
 /**
- * Checks if a given string contains characters that are nor numbers or dots (that is, operands)
+ * Checks if a given string contains operand characters
  *
  * @param  {String}  equationStr A string representation of an equation
- * @return {Boolean}             True if non-numerical characters exist, otherwise false
+ * @return {Boolean}             True if operand characters exist, otherwise false
  */
-EquationParser.prototype.hasOperands = function (equationStr) {
-  return /[^\d\.]/.test(equationStr);
-};
+function hasOperands (equationStr) {
+  SUPPORTED_OPERANDS_REGEX.lastIndex = 0;
+  return SUPPORTED_OPERANDS_REGEX.test(equationStr);
+}
 
 /**
  * An overload of parseEquation().
