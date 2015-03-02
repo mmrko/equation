@@ -35,7 +35,7 @@ function EquationParser() {}
  */
 function validateEquation(equationStr) {
 
-  var regexStr = '[^\\d]{2,}|[^\\d\\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
+  var regexStr = '\\D{2,}|[^\\d\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
   var validationRegex = new RegExp(regexStr, 'gi');
 
   if (validationRegex.test(equationStr)) {
@@ -47,16 +47,21 @@ function validateEquation(equationStr) {
 /**
  * Sanitizes the equation string:
  *   - strip whitespace
- *   - pad decimal points with missing zeros
+ *   - strip repeating operands
+ *   - pad decimal points with leading/trailing zeros
  *
  * @param  {String} equationStr The equation
  * @return {String}             A sanitized equation
  */
 function sanitizeEquation(equationStr) {
 
+  var repeatingCharsRegex = new RegExp('([\\.\\' + SUPPORTED_OPERANDS.join('\\') + '])(?=\\1+)', 'gi');
+
   return equationStr
     // Strip whitespace
     .replace(/\s+/g, '')
+    // Strip repeating operands and decimal points (e.g. 1+++2 => 1+2)
+    .replace(repeatingCharsRegex, '')
     // Pad decimal points with zeros
     .replace(/(\D)\.(\d)/g, function (m, p1, p2) {
       return p1 + '0.' + p2;
@@ -117,7 +122,7 @@ function parseEquation(equationStr, operands) {
 
 /**
  * An overload of parseEquation().
- * Strips whitespace & validates the input before passing it to parseEquation().
+ * Sanitizes & validates the input before passing it to parseEquation().
  *
  * @param  {String}  equationStr A string representation of an equation
  * @return {Equation}            An Equation instance
