@@ -13,7 +13,7 @@
 var equationStr = process.argv[2];
 
 if (!equationStr) {
-  return console.log('Usage: ./index.js 1+2-3*4/5%6^7');
+  return console.log('Usage: ./index.js 7+6-5*4.3/2^1.0');
 }
 
 var EquationParser = require('./EquationParser');
