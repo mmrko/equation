@@ -10,16 +10,16 @@
 
 'use strict';
 
-var EquationParser = require('./EquationParser');
-
-var equationParser = new EquationParser();
 var equationStr = process.argv[2];
 
 if (!equationStr) {
   return console.log('Usage: ./index.js 1+2-3*4/5%6^7');
 }
 
+var EquationParser = require('./EquationParser');
+
 try {
+  var equationParser = new EquationParser();
   var equation = equationParser.parseEquation(equationStr);
   var result = equation.compute();
   console.log('Result:', result);
