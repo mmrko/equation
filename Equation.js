@@ -3,7 +3,7 @@
 /**
  * Equation constructor
  *
- * @param {Array} values   An array of integers and/or other Equation instances
+ * @param {Array} values   An array of numbers and/or Equation instances
  * @param {String} operand Operand by which the values are accumulated
  */
 function Equation(values, operand) {

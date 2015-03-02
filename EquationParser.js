@@ -85,9 +85,10 @@ function hasOperands (equationStr) {
 
 /**
  * Parses the string representation of an equation into an Equation instance
- * consisting of integers and/or other Equation instances
+ * consisting of numbers and/or Equation instances
+ *
  * @param  {String} equationStr A string representation of an equation
- * @param  {Array} operands     A string array of operands to process
+ * @param  {Array} operands     An array of operands to process (defaults to SUPPORTED_OPERANDS)
  * @return {Equation}           An Equation instance
  */
 function parseEquation(equationStr, operands) {
@@ -98,7 +99,7 @@ function parseEquation(equationStr, operands) {
 
   operands = operands ? operands.slice() : SUPPORTED_OPERANDS.slice();
 
-  // Split the equation string into strings of sub-equations
+  // Try splitting the equation into sub-equations by iterating over the operands
   while ((operand = operands.shift()) !== undefined) {
     subEquations = equationStr.split(operand);
     if (subEquations.length > 1) { break; }
