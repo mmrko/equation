@@ -15,12 +15,12 @@ var OPERATIONS = {
 /**
  * Equation constructor
  *
- * @param {Array} values   An array of numbers and/or Equation instances
- * @param {String} operand Operand by which the values are accumulated
+ * @param {Array} subequations An array of numbers and/or Equation instances
+ * @param {String} operand     Operand by which the subequations are accumulated
  */
-function Equation(values, operand) {
+function Equation(subequations, operand) {
 
-  this.values = values;
+  this.subequations = subequations;
   this.operand = operand;
 
 }
@@ -32,8 +32,8 @@ Equation.prototype.compute = function () {
 
   var operation = OPERATIONS[this.operand];
 
-  return this.values.map(function (value) {
-    return value instanceof Equation ? this.compute.call(value) : value;
+  return this.subequations.map(function (subequation) {
+    return subequation instanceof Equation ? this.compute.call(subequation) : subequation;
   }, this).reduce(function (prev, current) {
     return operation.apply(null, [ prev, current ]);
   }.bind(this));

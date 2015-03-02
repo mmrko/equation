@@ -95,18 +95,18 @@ function parseEquation(equationStr, operands) {
 
   /* jshint validthis:true */
 
-  var subEquations, operand, values;
+  var subEquationStrings, subequations, operand;
 
   operands = operands ? operands.slice() : SUPPORTED_OPERANDS.slice();
 
   // Try splitting the equation into sub-equations by iterating over the operands
   while ((operand = operands.shift()) !== undefined) {
-    subEquations = equationStr.split(operand);
-    if (subEquations.length > 1) { break; }
+    subEquationStrings = equationStr.split(operand);
+    if (subEquationStrings.length > 1) { break; }
   }
 
   // Iterate over the sub-equations and call parseEquation recursively if the sub-equation contains operands
-  values = subEquations.map(function (subEquationStr) {
+  subequations = subEquationStrings.map(function (subEquationStr) {
 
     if (hasOperands(subEquationStr)) {
         return parseEquation.apply(this, [ subEquationStr, operands ]);
@@ -117,7 +117,7 @@ function parseEquation(equationStr, operands) {
 
   }, this);
 
-  return new Equation(values, operand);
+  return new Equation(subequations, operand);
 
 }
 
