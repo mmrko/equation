@@ -15,7 +15,7 @@ var eq3 = equationParser.parseEquation(' 1    + 2+ 4   /2   ');
 var eq4 = equationParser.parseEquation('1+++2**4//2-4..0--....5^^4');
 var eq5 = equationParser.parseEquation.bind(equationParser, '2*(1+1)');
 var eq6 = equationParser.parseEquation('2^2^3');
-var eq6 = equationParser.parseEquation('10%30%8');
+var eq7 = equationParser.parseEquation('10%30%8');
 var eq8 = equationParser.parseEquation.bind(equationParser, 'abs(-1)');
 var eq9 = equationParser.parseEquation('*1+2-');
 
