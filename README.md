@@ -1,6 +1,11 @@
 ### Usage ###
 
-`./index.js "7+6-5*4.3/2^1.0"`
+`./index.js "7+6-5*4.3/2^1.0" [--skip-sanitize] [--skip-validate]`
+
+The following input flags can be used to control the behaviour of the equation parser:
+
+    skip-sanitize: skip input sanitization
+    skip-validate: skip input validation (to achieve better performance)
 
 Supported operands: `+`, `-`, `/`, `*`, `%`, `^`
 

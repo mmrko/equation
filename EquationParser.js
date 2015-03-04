@@ -19,9 +19,9 @@
  *         *
  *        / \
  *       5   3
- * 
+ *
  * where an operand node & its immediate children (sub-equations) form an Equation.
- * 
+ *
  */
 
 var Equation = require('./Equation');
@@ -37,12 +37,11 @@ function EquationParser() {}
  *
  * @param  {String} equationStr
  * @throws {Error}  Throws an Error if the input is invalid
- * @todo Horribly slow. We can do better (simplify)
  */
 function validateEquation(equationStr) {
 
   var regexStr = '\\D{2,}|[^\\d\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
-  var validationRegex = new RegExp(regexStr, 'gi');
+  var validationRegex = new RegExp(regexStr);
 
   if (validationRegex.test(equationStr)) {
     throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS.join(', '));
@@ -127,18 +126,23 @@ function parseEquation(equationStr, operands) {
  * An overload of parseEquation().
  * Sanitizes & validates the input before passing it to parseEquation().
  *
- * @param  {String}  equationStr A string representation of an equation
- * @return {Equation}            An Equation instance
+ * @param  {String}  equationStr             A string representation of an equation
+ * @param  {Object}  [options]
+ * @param  {Boolean} [options.skipSanitize]  Boolean to control input sanitization (default: false)
+ * @param  {Boolean} [options.skipValidate]  Boolean to control input validation (default: false)
+ * @return {Equation}                        An Equation instance
  *
  * @see  parseEquation()
  */
-EquationParser.prototype.parseEquation = function (equationStr) {
+EquationParser.prototype.parseEquation = function (equationStr, options) {
+
+  options = options || {};
 
   // Sanitize
-  equationStr = sanitizeEquation(equationStr);
+  if (!options.skipSanitize) { equationStr = sanitizeEquation(equationStr); }
 
   // Validate
-  validateEquation(equationStr)
+  if (!options.skipValidate) { validateEquation(equationStr); }
 
   // Parse
   return parseEquation.call(this, equationStr);
