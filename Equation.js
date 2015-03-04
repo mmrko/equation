@@ -36,7 +36,7 @@ Equation.prototype.compute = function () {
     return subequation instanceof Equation ? this.compute.call(subequation) : subequation;
   }, this).reduce(function (prev, current) {
     return operation.apply(null, [ prev, current ]);
-  }.bind(this));
+  });
 
 };
 
