@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "./test.js",
-    "jshint": "jshint *.js"
+    "jshint": "jshint *.js",
+    "benchmark": "./benchmark.js"
   },
   "author": "Marko Raatikka",
   "license": "MIT",
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "jshint": "^2.6.2"
   }
 }
