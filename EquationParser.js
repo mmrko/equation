@@ -26,7 +26,7 @@
 
 var Equation = require('./Equation');
 var SUPPORTED_OPERANDS = Equation.SUPPORTED_OPERANDS;
-var SUPPORTED_OPERANDS_REGEX = new RegExp('[\\' + SUPPORTED_OPERANDS.join('\\') + ']', 'gi');
+var SUPPORTED_OPERANDS_REGEX = new RegExp('[\\' + SUPPORTED_OPERANDS.join('\\') + ']');
 
 function EquationParser() {}
 
@@ -50,7 +50,8 @@ function validateEquation(equationStr) {
 }
 
 /**
- * Sanitizes the equation string:
+ * Sanitizes/normalizes the equation string:
+ *   - convert to lowercase
  *   - strip whitespace
  *   - strip repeating operands
  *   - pad decimal points with leading/trailing zeros
@@ -60,9 +61,10 @@ function validateEquation(equationStr) {
  */
 function sanitizeEquation(equationStr) {
 
-  var repeatingCharsRegex = new RegExp('([\\.\\' + SUPPORTED_OPERANDS.join('\\') + '])(?=\\1+)', 'gi');
+  var repeatingCharsRegex = new RegExp('([\\.\\' + SUPPORTED_OPERANDS.join('\\') + '])(?=\\1+)', 'g');
 
   return equationStr
+    .toLowerCase()
     // Strip whitespace
     .replace(/\s+/g, '')
     // Strip repeating operands and decimal points (e.g. 1+++2 => 1+2)
