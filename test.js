@@ -30,12 +30,11 @@ try {
   assert.equal(eq2.compute(), 20.5, 'should handle floats');
   assert.equal(eq3.compute(), 5, 'should handle whitespace input');
   assert.equal(eq4.compute(), 0.9375, 'should handle input with repeating operands and decimal points');
+
+  assert.equal(eq6.compute(), 256, 'should handle power of power');
+  assert.equal(eq7.compute(), 4, 'should handle modulo of modulo');
   // @todo Implement support for parentheses
   assert.doesNotThrow(eq5, Error, 'should handle parentheses');
-  // @todo Implement support for power of power
-  assert.equal(eq6.compute(), 256, 'should handle power of power');
-  // @todo Implement support for modulo of modulo
-  assert.equal(eq7.compute(), 4, 'should handle modulo of modulo');
   // @todo Implement support for unary operands
   assert.doesNotThrow(eq8, Error, 'should handle unary operands');
   // @todo Implement support for handling leading/trailing operands

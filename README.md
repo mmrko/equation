@@ -14,6 +14,5 @@ For less complex equations (trees) the performance gain of skipping sanitization
 ### TODO ###
 
 * support parentheses
-* support power of power (e.g. `2^2^2`) & modulo of modulo (e.g. `10%30%8`)
 * support unary operations (e.g. `sqrt` and `abs`)
 * improve input validation (e.g. check for leading/trailing operand)

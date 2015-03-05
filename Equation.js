@@ -32,9 +32,18 @@ Equation.prototype.compute = function () {
 
   var operation = OPERATIONS[this.operand];
 
-  return this.subequations.map(function (subequation) {
+  var numbers = this.subequations.map(function (subequation) {
     return subequation instanceof Equation ? this.compute.call(subequation) : subequation;
-  }, this).reduce(function (prev, current) {
+  }, this);
+
+  // power of power and modulo of modulo are computed from right to left
+  if (this.operand === '^' || this.operand === '%') {
+    return numbers.reduceRight(function (prev, current) {
+      return operation.apply(null, [ current, prev ]);
+    });
+  }
+
+  return numbers.reduce(function (prev, current) {
     return operation.apply(null, [ prev, current ]);
   });
 
