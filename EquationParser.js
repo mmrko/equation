@@ -4,21 +4,21 @@
  * Parses a string-based equation into a tree of operands &
  * an array of numbers and/or Equation instances.
  *
- * For example, the equation 5*3-2+1-3 becomes:
+ * For example, the equation 5*3-(2+1*0.5)-1%3 becomes
  *
- *            5*3-2+1-3
- *                |
- *                +
- *             /     \
- *          5*3-2    1-3
- *            |       |
- *            -       -
- *          /   \    / \
- *        5*3    2  1   3
- *         |
- *         *
- *        / \
- *       5   3
+ *               5*3-(2+1*0.5)-1%3
+ *                     |
+ *                     -
+ *               /     \      \
+ *            5*3   2+1*0.5   1%3
+ *             |      |        |
+ *             -      +        %
+ *           /  \    / \      / \
+ *         5*3  2  2  1*0.5  1   3
+ *         |           |
+ *         *           *
+ *        / \         / \
+ *       5   3       1  0.5
  *
  * where an operand node & its immediate children (sub-equations) form an Equation.
  *
@@ -32,15 +32,17 @@ function EquationParser() {}
 
 /**
  * Validates a given equation string by checking if it contains
- *   - characters that are not numbers, decimal points or operands
+ *   - characters that are not numbers, decimal points, operands or parentheses
  *   - two or more consecutive non-numerical characters (e.g. ++, *., /-)
  *
  * @param  {String} equationStr
  * @throws {Error}  Throws an Error if the input is invalid
+ *
+ * @todo  Check if parentheses are in balance
  */
 function validateEquation(equationStr) {
 
-  var regexStr = '\\D{2,}|[^\\d\.\\' + SUPPORTED_OPERANDS.join('\\') + ']';
+  var regexStr = '[^\\d\\(\\)]{2,}|[^\\d\\.\\(\\)\\' + SUPPORTED_OPERANDS.join('\\') + ']';
   var validationRegex = new RegExp(regexStr);
 
   if (validationRegex.test(equationStr)) {
@@ -87,6 +89,69 @@ function hasOperands (equationStr) {
 }
 
 /**
+ * Checks if a given equation string is surrounded by parentheses
+ * @param  {String}  equationStr
+ * @return {Boolean}             True if the equation string is surrounded by parentheses,
+ *                               false otherwise
+ */
+function hasSurroundingParens (equationStr) {
+
+  var length = equationStr.length;
+  var parentheses = -1;
+  var idx, char;
+
+  if (equationStr[0] !== '(' || equationStr[length - 1] !== ')') { return false; }
+
+  for (idx = length - 1; idx--;) {
+    char = equationStr[idx];
+    if (char === '(') { parentheses++; }
+    else if (char === ')') { parentheses--; }
+    if (!parentheses && idx) { return false; }
+  }
+
+  return true;
+}
+
+/**
+ * Split the equation string by operand (parentheses aware).
+ * Uses String.split() if the equation contains no parentheses.
+ * @param  {String} equationStr  e.g. 1+1
+ * @param  {String} operand      e.g. +
+ * @return {Array}               An array of subequation strings
+ */
+function split(equationStr, operand) {
+
+  // Return immediately if the given operand doesn't exist
+  if (equationStr.indexOf(operand) === -1) { return [ equationStr ]; }
+
+  // Use String.split() if the equation string contains no parentheses
+  if (equationStr.indexOf('(') === -1 && equationStr.indexOf(')') === -1) {
+    return equationStr.split(operand);
+  }
+
+  var parentheses = 0;
+  var subEquationStrings = [];
+  var cBegin, cEnd, char;
+
+  for (cBegin = cEnd = equationStr.length; cBegin--;) {
+
+    char = equationStr[cBegin];
+
+    if (char === '(') { parentheses++; }
+    else if (char === ')') { parentheses--; }
+    else if (char === operand && !parentheses) {
+      subEquationStrings.unshift(equationStr.substring(cBegin + 1, cEnd));
+      cEnd = cBegin;
+    }
+
+  }
+
+  subEquationStrings.unshift(equationStr.substring(0, cEnd));
+
+  return subEquationStrings;
+}
+
+/**
  * Parses the string representation of an equation into an Equation instance
  * consisting of numbers and/or other Equation instances.
  *
@@ -101,6 +166,10 @@ function parseEquation(equationStr, operands) {
     return new Equation(number);
   }
 
+  if (hasSurroundingParens(equationStr)) {
+    return parseEquation(equationStr.replace(/^\(|\)$/g, ''));
+  }
+
   /* jshint validthis:true */
 
   var subEquationStrings, subequations, operand;
@@ -109,13 +178,13 @@ function parseEquation(equationStr, operands) {
 
   // Try splitting the equation into sub-equations using each of the supported operands
   while ((operand = operands.shift()) !== undefined) {
-    subEquationStrings = equationStr.split(operand);
+    subEquationStrings = split(equationStr, operand);
     if (subEquationStrings.length > 1) { break; }
   }
 
   // Iterate over the sub-equations and call parseEquation recursively
   subequations = subEquationStrings.map(function (subEquationStr) {
-    return parseEquation.apply(null, [ subEquationStr, operands ]);
+    return parseEquation(subEquationStr, operands);
   });
 
   return new Equation(subequations, operand);

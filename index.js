@@ -5,7 +5,7 @@
  * into an object and computes it. Prints the result into stdout.
  *
  * Usage:
- *   ./index.js "1+2-3*4/5%6^7" [--skip-sanitize] [--skip-validate]
+ *   ./index.js "7+(6-5)*4.3/2^1.0 [--skip-sanitize] [--skip-validate]
  */
 
 'use strict';
@@ -13,7 +13,7 @@
 var equationStr = process.argv[2];
 
 if (!equationStr) {
-  return console.log('Usage: ./index.js "7+6-5*4.3/2^1.0" [--skip-sanitize] [--skip-validate]');
+  return console.log('Usage: ./index.js "7+(6-5)*4.3/2^1.0 [--skip-sanitize] [--skip-validate]');
 }
 
 var EquationParser = require('./EquationParser');
