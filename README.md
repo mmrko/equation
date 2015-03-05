@@ -2,7 +2,7 @@
 
 `./index.js "7+(6-5)*4.3/2^1.0" [--skip-sanitize] [--skip-validate]`
 
-Supported operands: `+`, `-`, `/`, `*`, `%`, `^`
+Supported operands: `+`, `-`, `/`, `*`, `%`, `^`, 'sqrt', 'abs'
 
 The following input flags can be used to control the behaviour of the equation parser:
 
@@ -13,5 +13,4 @@ For less complex equations (trees) the performance gain of skipping sanitization
 
 ### TODO ###
 
-* support unary operations (e.g. `sqrt` and `abs`)
 * improve input validation (e.g. check for leading/trailing operand)

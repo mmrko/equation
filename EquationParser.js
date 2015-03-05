@@ -9,16 +9,16 @@
  *               5*3-(2+1*0.5)-1%3
  *                     |
  *                     -
- *               /     \      \
- *            5*3   2+1*0.5   1%3
- *             |      |        |
- *             -      +        %
- *           /  \    / \      / \
- *         5*3  2  2  1*0.5  1   3
- *         |           |
- *         *           *
- *        / \         / \
- *       5   3       1  0.5
+ *               /     |       \
+ *            5*3   2+1*0.5    1%3
+ *             |       |         \
+ *             -       +          %
+ *           /  \    /  \        / \
+ *          5   3   2  1*0.5    1   3
+ *                       |
+ *                       *
+ *                      / \
+ *                     1  0.5
  *
  * where an operand node & its immediate children (sub-equations) form an Equation.
  *
@@ -26,7 +26,7 @@
 
 var Equation = require('./Equation');
 var SUPPORTED_OPERANDS = Equation.SUPPORTED_OPERANDS;
-var SUPPORTED_OPERANDS_REGEX = new RegExp('[\\' + SUPPORTED_OPERANDS.join('\\') + ']');
+var SUPPORTED_OPERANDS_REGEX = new RegExp('[\\' + SUPPORTED_OPERANDS.ternary.join('\\') + SUPPORTED_OPERANDS.unary.join('') + ']');
 
 function EquationParser() {}
 
@@ -42,11 +42,15 @@ function EquationParser() {}
  */
 function validateEquation(equationStr) {
 
-  var regexStr = '[^\\d\\(\\)]{2,}|[^\\d\\.\\(\\)\\' + SUPPORTED_OPERANDS.join('\\') + ']';
+  var regexStr = '[^\\d\\.\\(\\)\\' + SUPPORTED_OPERANDS.ternary.join('\\') + SUPPORTED_OPERANDS.unary.join('') + ']';
   var validationRegex = new RegExp(regexStr);
 
   if (validationRegex.test(equationStr)) {
-    throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS.join(', '));
+    throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS);
+  }
+
+  if (/\D\.\D/.test(equationStr)) {
+    throw new Error('Invalid use of the decimal point.');
   }
 
 }
@@ -63,7 +67,7 @@ function validateEquation(equationStr) {
  */
 function sanitizeEquation(equationStr) {
 
-  var repeatingCharsRegex = new RegExp('([\\.\\' + SUPPORTED_OPERANDS.join('\\') + '])(?=\\1+)', 'g');
+  var repeatingCharsRegex = new RegExp('([\\.]|' + SUPPORTED_OPERANDS_REGEX.source + ')(?=\\1+)', 'g');
 
   return equationStr
     .toLowerCase()
@@ -161,13 +165,15 @@ function split(equationStr, operand) {
  */
 function parseEquation(equationStr, operands) {
 
-  if (!hasOperands(equationStr)) {
-    var number = parseFloat(equationStr, 10);
-    return new Equation(number);
-  }
+  equationStr = equationStr || '0';
 
   if (hasSurroundingParens(equationStr)) {
     return parseEquation(equationStr.replace(/^\(|\)$/g, ''));
+  }
+
+  if (!hasOperands(equationStr)) {
+    var number = parseFloat(equationStr, 10);
+    return new Equation(number);
   }
 
   /* jshint validthis:true */
@@ -181,6 +187,8 @@ function parseEquation(equationStr, operands) {
     subEquationStrings = split(equationStr, operand);
     if (subEquationStrings.length > 1) { break; }
   }
+
+  if (Equation.isUnaryOperand(operand)) { subEquationStrings.shift(); }
 
   // Iterate over the sub-equations and call parseEquation recursively
   subequations = subEquationStrings.map(function (subEquationStr) {
@@ -206,6 +214,8 @@ function parseEquation(equationStr, operands) {
 EquationParser.prototype.parseEquation = function (equationStr, options) {
 
   options = options || {};
+
+  equationStr = equationStr.replace(/(s)qrt|(a)bs/gi, '$1$2');
 
   // Sanitize
   if (!options.skipSanitize) { equationStr = sanitizeEquation(equationStr); }

@@ -23,11 +23,11 @@ var options = {
   skipValidate: process.argv.indexOf('--skip-validate') !== -1
 };
 
-try {
+// try {
   var equationParser = new EquationParser();
   var equation = equationParser.parseEquation(equationStr, options);
   var result = equation.compute();
   console.log('Result:', result);
-} catch (e) {
-  console.error(e.message);
-}
+// } catch (e) {
+//   console.error(e.message);
+// }
