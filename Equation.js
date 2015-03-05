@@ -20,7 +20,7 @@ var OPERATIONS = {
  */
 function Equation(subequations, operand) {
 
-  this.subequations = subequations;
+  this.subequations = Array.isArray(subequations) ? subequations : [ subequations ];
   this.operand = operand;
 
 }

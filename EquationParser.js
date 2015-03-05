@@ -96,6 +96,11 @@ function hasOperands (equationStr) {
  */
 function parseEquation(equationStr, operands) {
 
+  if (!hasOperands(equationStr)) {
+    var number = parseFloat(equationStr, 10);
+    return new Equation(number);
+  }
+
   /* jshint validthis:true */
 
   var subEquationStrings, subequations, operand;
@@ -108,17 +113,10 @@ function parseEquation(equationStr, operands) {
     if (subEquationStrings.length > 1) { break; }
   }
 
-  // Iterate over the sub-equations and call parseEquation recursively if the sub-equation contains operands
+  // Iterate over the sub-equations and call parseEquation recursively
   subequations = subEquationStrings.map(function (subEquationStr) {
-
-    if (hasOperands(subEquationStr)) {
-        return parseEquation.apply(this, [ subEquationStr, operands ]);
-    }
-    else {
-        return parseFloat(subEquationStr, 10);
-    }
-
-  }, this);
+    return parseEquation.apply(null, [ subEquationStr, operands ]);
+  });
 
   return new Equation(subequations, operand);
 
