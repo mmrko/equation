@@ -10,31 +10,37 @@ var OPERATIONS = {
   '*': function (a, b) { return a * b; },
   '/': function (a, b) { return a / b; },
   '^': function (a, b) { return Math.pow(a, b); },
-  's': function (a) { return Math.sqrt(a); },
-  'a': function (a) { return Math.abs(a); }
+  s: function (a) { return Math.sqrt(a); },
+  a: function (a) { return Math.abs(a); }
 };
 
 var SUPPORTED_OPERANDS = Object.keys(OPERATIONS);
 
-Object.defineProperty(SUPPORTED_OPERANDS, 'unary', {
-  value: SUPPORTED_OPERANDS.filter(function (operand) { return OPERATIONS[operand].length === 1; })
-});
-Object.defineProperty(SUPPORTED_OPERANDS, 'ternary', {
-  value: SUPPORTED_OPERANDS.filter(function (operand) { return OPERATIONS[operand].length === 2; })
-});
-Object.defineProperty(SUPPORTED_OPERANDS, 'toString', {
-  value: function () { return this.join(', '); }
+Object.defineProperties(SUPPORTED_OPERANDS, {
+  unary: {
+    value: SUPPORTED_OPERANDS.filter(function (operand) { return OPERATIONS[operand].length === 1; })
+  },
+  ternary: {
+    value: SUPPORTED_OPERANDS.filter(function (operand) { return OPERATIONS[operand].length === 2; })
+  },
+  toString: {
+    value: function () {
+      return this.map(function (operand) {
+        return operand === 's' ? 'sqrt' : (operand === 'a' ? 'abs' : operand);
+      }).join(', ');
+    }
+  }
 });
 
 /**
  * Equation constructor
  *
- * @param {Array}  subequations An array of numbers and/or Equation instances
- * @param {String} [operand]   Operand by which the subequations are accumulated
+ * @param {Array|String}  subequations An array (of numbers/Equation instances) or a string
+ * @param {String}        [operand]    Operand by which the subequations should be accumulated
  */
 function Equation(subequations, operand) {
 
-  this.subequations = Array.isArray(subequations) ? subequations : [ subequations ];
+  this.subequations = typeof subequations === 'string' ? [ parseFloat(subequations, 10) ] : subequations;
   this.operand = operand;
 
 }
@@ -49,12 +55,13 @@ function isUnaryOperand (operand) {
 Equation.prototype.compute = function () {
 
   var operand = this.operand;
+  var subequations = this.subequations;
 
-  if (!operand) { return this.subequations[0]; }
+  if (!operand) { return subequations[0]; }
 
   var operation = OPERATIONS[operand];
 
-  var numbers = this.subequations.map(function (subequation) {
+  var numbers = subequations.map(function (subequation) {
     return subequation instanceof Equation ? this.compute.call(subequation) : subequation;
   }, this);
 

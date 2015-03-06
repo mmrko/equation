@@ -10,7 +10,7 @@ var equationParser = new EquationParser();
 var parseEquationWithInvalidCharacters = equationParser.parseEquation.bind(equationParser, '1+c+2+b+3');
 var parseEquationWithInvalidDot = equationParser.parseEquation.bind(equationParser, '1+.-2');
 var parseEquationSkipSanitization = equationParser.parseEquation.bind(equationParser, '1 + 1', { skipSanitize: true });
-var eq0 = equationParser.parseEquation('1+1+z', { skipValidate: true });
+var parseEquationSkipValidate = equationParser.parseEquation.bind(equationParser, '1+1+z', { skipValidate: true });
 var eq1 = equationParser.parseEquation('2*6+5-2%2-5^3-1+1/5-1');
 var eq2 = equationParser.parseEquation('.5+2./.1');
 var eq3 = equationParser.parseEquation(' 1    + 2+ 4   /2   ');
@@ -25,7 +25,7 @@ try {
   assert.throws(parseEquationWithInvalidCharacters, Error, 'should throw if equation contains characters');
   assert.throws(parseEquationWithInvalidDot, Error, 'should throw if equation uses dot incorrectly');
   assert.throws(parseEquationSkipSanitization, Error, 'should throw if equation contains whitespace');
-  assert.equal(Number.isNaN(eq0.compute()), true, 'should not be able to compute an equation containing invalid characters');
+  assert.throws(parseEquationSkipValidate, Error, 'should not be able to compute an equation containing invalid characters');
   assert.equal(eq1.compute(), -109.8, 'should handle supported operands');
   assert.equal(eq2.compute(), 20.5, 'should handle floats');
   assert.equal(eq3.compute(), 5, 'should handle whitespace input');

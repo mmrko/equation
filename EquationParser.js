@@ -26,7 +26,6 @@
 
 var Equation = require('./Equation');
 var SUPPORTED_OPERANDS = Equation.SUPPORTED_OPERANDS;
-var SUPPORTED_OPERANDS_REGEX = new RegExp('[\\' + SUPPORTED_OPERANDS.ternary.join('\\') + SUPPORTED_OPERANDS.unary.join('') + ']');
 
 function EquationParser() {}
 
@@ -67,7 +66,7 @@ function validateEquation(equationStr) {
  */
 function sanitizeEquation(equationStr) {
 
-  var repeatingCharsRegex = new RegExp('([\\.]|' + SUPPORTED_OPERANDS_REGEX.source + ')(?=\\1+)', 'g');
+  var repeatingCharsRegex = new RegExp('([\\.\\' + SUPPORTED_OPERANDS.ternary.join('\\') + SUPPORTED_OPERANDS.unary.join('') + '])(?=\\1+)', 'g');
 
   return equationStr
     .toLowerCase()
@@ -79,17 +78,6 @@ function sanitizeEquation(equationStr) {
     .replace(/(\D)\.(\d)/g, function (m, p1, p2) { return p1 + '0.' + p2; })
     .replace(/(\d)\.(\D)/g, function (m, p1, p2) { return p1 + '.0' + p2; });
 
-}
-
-/**
- * Checks if a given string contains any of the supported operands
- *
- * @param  {String}  equationStr A string representation of an equation
- * @return {Boolean}             True if operand characters exist, otherwise false
- */
-function hasOperands (equationStr) {
-  SUPPORTED_OPERANDS_REGEX.lastIndex = 0;
-  return SUPPORTED_OPERANDS_REGEX.test(equationStr);
 }
 
 /**
@@ -129,7 +117,7 @@ function split(equationStr, operand) {
   if (equationStr.indexOf(operand) === -1) { return [ equationStr ]; }
 
   // Use String.split() if the equation string contains no parentheses
-  if (equationStr.indexOf('(') === -1 && equationStr.indexOf(')') === -1) {
+  if (!/\(|\)/.test(equationStr)) {
     return equationStr.split(operand);
   }
 
@@ -157,7 +145,7 @@ function split(equationStr, operand) {
 
 /**
  * Parses the string representation of an equation into an Equation instance
- * consisting of numbers and/or other Equation instances.
+ * consisting of one or more Equation instances.
  *
  * @param  {String} equationStr A string representation of an equation
  * @param  {Array} operands     An array of operands to process (defaults to SUPPORTED_OPERANDS)
@@ -167,13 +155,12 @@ function parseEquation(equationStr, operands) {
 
   equationStr = equationStr || '0';
 
-  if (hasSurroundingParens(equationStr)) {
-    return parseEquation(equationStr.replace(/^\(|\)$/g, ''));
+  if (!isNaN(equationStr)) {
+    return new Equation(equationStr);
   }
 
-  if (!hasOperands(equationStr)) {
-    var number = parseFloat(equationStr, 10);
-    return new Equation(number);
+  if (hasSurroundingParens(equationStr)) {
+    return parseEquation(equationStr.replace(/^\(|\)$/g, ''));
   }
 
   /* jshint validthis:true */
@@ -188,6 +175,7 @@ function parseEquation(equationStr, operands) {
     if (subEquationStrings.length > 1) { break; }
   }
 
+  // Unary operands are one-sided assignments so drop split's first entry (which is '')
   if (Equation.isUnaryOperand(operand)) { subEquationStrings.shift(); }
 
   // Iterate over the sub-equations and call parseEquation recursively
@@ -215,6 +203,7 @@ EquationParser.prototype.parseEquation = function (equationStr, options) {
 
   options = options || {};
 
+  // Alias unary operands for faster matching: sqrt => s, abs => a
   equationStr = equationStr.replace(/(s)qrt|(a)bs/gi, '$1$2');
 
   // Sanitize
@@ -224,7 +213,7 @@ EquationParser.prototype.parseEquation = function (equationStr, options) {
   if (!options.skipValidate) { validateEquation(equationStr); }
 
   // Parse
-  return parseEquation.call(this, equationStr);
+  return parseEquation(equationStr);
 
 };
 
