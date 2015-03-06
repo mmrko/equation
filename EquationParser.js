@@ -37,9 +37,11 @@ function EquationParser() {}
 function hasBalancedParentheses (equationStr) {
 
   // Check for odd number of parentheses
-  if(equationStr.replace(/[^\(\)]/g, '').split('').length % 2) {
+  /* jslint bitwise: true */
+  if(equationStr.replace(/[^\(\)]/g, '').split('').length & 1) {
     return false;
   }
+  /* jslint bitwise: false */
 
   var parentheses = 0, i;
   for (i = equationStr.length; i--;) {
