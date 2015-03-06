@@ -66,7 +66,7 @@ Equation.prototype.compute = function () {
   }, this);
 
   if (isUnaryOperand(operand)) {
-    return operation(numbers[0]);
+    return operation.apply(null, numbers);
   }
 
   // power of power and modulo of modulo are computed from right to left
