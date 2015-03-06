@@ -32,7 +32,7 @@ function EquationParser() {}
 /**
  * Checks if the parentheses of the given equation are balanced.
  * @param  {String}  equationStr
- * @return {Boolean}             False if inbalanced, otherwise true
+ * @return {Boolean}             False if unbalanced, otherwise true
  */
 function hasBalancedParentheses (equationStr) {
 
@@ -138,8 +138,8 @@ function hasSurroundingParens (equationStr) {
 
   if (equationStr[0] !== '(' || equationStr[length - 1] !== ')') { return false; }
 
-  // Loop through the characters from right to left and return false
-  // if we hit an opening parentheses that matches the surrounding closing parentheses
+  // Loop through the characters from right to left and return false if we hit
+  // an opening parenthesis that matches the surrounding closing parenthesis
   // before we have reached the last character
   for (idx = length - 1; idx--;) {
     char = equationStr[idx];
@@ -173,7 +173,7 @@ function split(equationStr, operand) {
   var cBegin, cEnd, char;
 
   // Loop through the characters from right to left and split the
-  // equation string into subequation string if the given operand
+  // equation string into subequation strings if the given operand
   // is not located within parentheses
   for (cBegin = cEnd = equationStr.length; cBegin--;) {
 
@@ -215,8 +215,6 @@ function parseEquation(equationStr, operands) {
     return parseEquation(equationStr.replace(/^\(|\)$/g, ''));
 
   }
-
-  /* jshint validthis:true */
 
   var subEquationStrings, subequations, operand;
 
