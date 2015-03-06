@@ -9,8 +9,8 @@ The following input flags can be used to control the behaviour of the equation p
     --skip-sanitize: skip input sanitization
     --skip-validate: skip input validation
 
-For less complex equations (trees) the performance gain of skipping sanitization & validation can be up to 40-50% (see [benchmark.js](benchmark.js) for more).
+For less complex equations (trees) the performance gain of skipping sanitization & validation can be up to 50-100% (see [benchmark.js](benchmark.js) for more).
 
 ### TODO ###
 
-* improve input validation (e.g. check for leading/trailing operand & parentheses balance)
+* improve input validation (e.g. make more generic / handle edge-cases)

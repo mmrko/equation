@@ -7,19 +7,26 @@ var EquationParser = require('./EquationParser');
 var suite = new Benchmark.Suite;
 
 var equationParser = new EquationParser();
-var input = '2%3+5-8*3/2.0^1.05+10';
+var inputs = {
+  a: '2%3+5-8*3/2.0^1.05+10',
+  b: 'sqrt(5^2)-(2/.5)-abs(-1.25)^2/1.5'
+};
 
 suite.add('EquationParser#parseEquation', function () {
-  var eq = equationParser.parseEquation(input);
+  equationParser.parseEquation(inputs.a);
+  equationParser.parseEquation(inputs.b);
 })
 .add('EquationParser#parseEquation w/o sanitization', function () {
-  var eq = equationParser.parseEquation(input, { skipSanitize: true });
+  equationParser.parseEquation(inputs.a, { skipSanitize: true });
+  equationParser.parseEquation(inputs.b, { skipSanitize: true });
 })
 .add('EquationParser#parseEquation w/o validation', function () {
-  var eq = equationParser.parseEquation(input, { skipValidate: true });
+  equationParser.parseEquation(inputs.a, { skipValidate: true });
+  equationParser.parseEquation(inputs.b, { skipValidate: true });
 })
 .add('EquationParser#parseEquation w/o sanitization & validation', function () {
-  var eq = equationParser.parseEquation(input, { skipSanitize: true, skipValidate: true });
+  equationParser.parseEquation(inputs.a, { skipSanitize: true, skipValidate: true });
+  equationParser.parseEquation(inputs.b, { skipSanitize: true, skipValidate: true });
 })
 .on('cycle', function(event) {
   console.log(String(event.target));

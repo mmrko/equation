@@ -2,7 +2,7 @@
 
 /**
  * Parses an equation given as a command-line argument
- * into an object and computes it. Prints the result into stdout.
+ * into an Equation object and computes it. Prints the result into stdout.
  *
  * Usage:
  *   ./index.js "7+(6-5)*4.3/2^1.0 [--skip-sanitize] [--skip-validate]
@@ -23,11 +23,11 @@ var options = {
   skipValidate: process.argv.indexOf('--skip-validate') !== -1
 };
 
-// try {
+try {
   var equationParser = new EquationParser();
   var equation = equationParser.parseEquation(equationStr, options);
   var result = equation.compute();
   console.log('Result:', result);
-// } catch (e) {
-//   console.error(e.message);
-// }
+} catch (e) {
+  console.error(e.message);
+}

@@ -25,14 +25,32 @@
  */
 
 var Equation = require('./Equation');
-var SUPPORTED_OPERANDS = Equation.SUPPORTED_OPERANDS;
+var SO = Equation.SUPPORTED_OPERANDS;
 
 function EquationParser() {}
 
 /**
- * Validates a given equation string by checking if it contains
- *   - characters that are not numbers, decimal points, operands or parentheses
- *   - two or more consecutive non-numerical characters (e.g. ++, *., /-)
+ * Checks if the parentheses of the given equation are balanced.
+ * @param  {String}  equationStr
+ * @return {Boolean}             False if inbalanced, otherwise true
+ */
+function hasBalancedParentheses (equationStr) {
+  var parentheses = 0, i;
+  for (i = equationStr.length; i--;) {
+    if (equationStr[i] === ')') { parentheses--; }
+    else if (equationStr[i] === '(') { parentheses++; }
+    if (parentheses === 1) { return false; }
+  }
+  return true;
+}
+
+/**
+ * Validates a given equation string by checking if it
+ *   - is missing operands [ e.g. 1+1(2+2) ]
+ *   - uses decimal point incorrectly [ e.g. +.- or ).( ]
+ *   - has unbalanced parentheses [ e.g (1+1)+(2*5-1)) ]
+ *   - has two or more consecutive operands [ e.g. 1++1 ]
+ *   - contains characters that are not numbers, decimal points, parentheses or operands
  *
  * @param  {String} equationStr
  * @throws {Error}  Throws an Error if the input is invalid
@@ -41,15 +59,29 @@ function EquationParser() {}
  */
 function validateEquation(equationStr) {
 
-  var regexStr = '[^\\d\\.\\(\\)\\' + SUPPORTED_OPERANDS.ternary.join('\\') + SUPPORTED_OPERANDS.unary.join('') + ']';
-  var validationRegex = new RegExp(regexStr);
+  var invalidCharsRegexStr = '[^\\d\\.\\(\\)\\' + SO.ternary.join('\\') + SO.unary.join('') + ']';
+  var consecutiveOperandsRegexStr = '[\\' + SO.ternary.join('\\') + ']{2,}';
+  var invalidCharsRegex = new RegExp(invalidCharsRegexStr);
+  var consecutiveOperandsRegex = new RegExp(consecutiveOperandsRegexStr);
 
-  if (validationRegex.test(equationStr)) {
-    throw new Error('The equation contains invalid characters. Supported operands: ' + SUPPORTED_OPERANDS);
+  if (/\)\(/.test(equationStr)) {
+    throw new Error('Missing an operand.');
   }
 
   if (/\D\.\D/.test(equationStr)) {
     throw new Error('Invalid use of the decimal point.');
+  }
+
+  if (!hasBalancedParentheses(equationStr)) {
+    throw new Error('Parentheses are not in balance.');
+  }
+
+  if (consecutiveOperandsRegex.test(equationStr)) {
+    throw new Error('Consecutive ternary operands detected.');
+  }
+
+  if (invalidCharsRegex.test(equationStr)) {
+    throw new Error('The equation contains invalid characters. Supported operands: ' + SO);
   }
 
 }
@@ -66,7 +98,8 @@ function validateEquation(equationStr) {
  */
 function sanitizeEquation(equationStr) {
 
-  var repeatingCharsRegex = new RegExp('([\\.\\' + SUPPORTED_OPERANDS.ternary.join('\\') + SUPPORTED_OPERANDS.unary.join('') + '])(?=\\1+)', 'g');
+  var repeatingCharsRegex = new RegExp('([\\.\\' + SO.ternary.join('\\') + SO.unary.join('') + '])(?=\\1+)', 'g');
+  var trailingLeadingOperands = new RegExp('^[\\' + SO.ternary.join('\\') + ']+|[\\' + SO.ternary.join('\\') + SO.unary.join('') + ']+$', 'g');
 
   return equationStr
     .toLowerCase()
@@ -74,6 +107,8 @@ function sanitizeEquation(equationStr) {
     .replace(/\s+/g, '')
     // Strip repeating operands and decimal points (e.g. 1+++2 => 1+2)
     .replace(repeatingCharsRegex, '')
+    // Strip leading/trailing ternary and unary operands (+1+2+abs => 1+2)
+    .replace(trailingLeadingOperands, '')
     // Pad decimal points with zeros (leading & trailing)
     .replace(/(\D)\.(\d)/g, function (m, p1, p2) { return p1 + '0.' + p2; })
     .replace(/(\d)\.(\D)/g, function (m, p1, p2) { return p1 + '.0' + p2; });
@@ -94,6 +129,9 @@ function hasSurroundingParens (equationStr) {
 
   if (equationStr[0] !== '(' || equationStr[length - 1] !== ')') { return false; }
 
+  // Loop through the characters from right to left and return false
+  // if we hit an opening parentheses that matches the surrounding closing parentheses
+  // before we have reached the last character
   for (idx = length - 1; idx--;) {
     char = equationStr[idx];
     if (char === '(') { parentheses++; }
@@ -125,6 +163,9 @@ function split(equationStr, operand) {
   var subEquationStrings = [];
   var cBegin, cEnd, char;
 
+  // Loop through the characters from right to left and split the
+  // equation string into subequation string if the given operand
+  // is not located within parentheses
   for (cBegin = cEnd = equationStr.length; cBegin--;) {
 
     char = equationStr[cBegin];
@@ -148,7 +189,7 @@ function split(equationStr, operand) {
  * consisting of one or more Equation instances.
  *
  * @param  {String} equationStr A string representation of an equation
- * @param  {Array} operands     An array of operands to process (defaults to SUPPORTED_OPERANDS)
+ * @param  {Array} operands     An array of operands to process (defaults to SO)
  * @return {Equation}           An Equation instance
  */
 function parseEquation(equationStr, operands) {
@@ -160,14 +201,17 @@ function parseEquation(equationStr, operands) {
   }
 
   if (hasSurroundingParens(equationStr)) {
+
+    // Strip surrounding parentheses and call parseEquation again
     return parseEquation(equationStr.replace(/^\(|\)$/g, ''));
+
   }
 
   /* jshint validthis:true */
 
   var subEquationStrings, subequations, operand;
 
-  operands = operands ? operands.slice() : SUPPORTED_OPERANDS.slice();
+  operands = operands ? operands.slice() : SO.slice();
 
   // Try splitting the equation into sub-equations using each of the supported operands
   while ((operand = operands.shift()) !== undefined) {
