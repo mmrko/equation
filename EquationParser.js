@@ -35,12 +35,19 @@ function EquationParser() {}
  * @return {Boolean}             False if inbalanced, otherwise true
  */
 function hasBalancedParentheses (equationStr) {
+
+  // Check for odd number of parentheses
+  if(equationStr.replace(/[^\(\)]/g, '').split('').length % 2) {
+    return false;
+  }
+
   var parentheses = 0, i;
   for (i = equationStr.length; i--;) {
     if (equationStr[i] === ')') { parentheses--; }
     else if (equationStr[i] === '(') { parentheses++; }
     if (parentheses === 1) { return false; }
   }
+
   return true;
 }
 
