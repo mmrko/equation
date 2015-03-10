@@ -1,8 +1,7 @@
 'use strict';
 
 /**
- * Parses a string-based equation into a tree of operands &
- * an array of numbers and/or Equation instances.
+ * Parses a string-based equation into a tree of operands & Equation instances.
  *
  * For example, the equation 5*3-(2+1*0.5)-1%3 becomes
  *
@@ -14,7 +13,7 @@
  *             |       |         \
  *             -       +          %
  *           /  \    /  \        / \
- *          5   3   2  1*0.5    1   3
+ *          5    3  2  1*0.5    1   3
  *                       |
  *                       *
  *                      / \
@@ -43,6 +42,7 @@ function hasBalancedParentheses (equationStr) {
   }
   /* jslint bitwise: false */
 
+  // Check that all opening/closing parens have a matching counterpart
   var parentheses = 0, i;
   for (i = equationStr.length; i--;) {
     if (equationStr[i] === ')') { parentheses--; }
@@ -104,6 +104,8 @@ function validateEquation(equationStr) {
  *
  * @param  {String} equationStr The equation
  * @return {String}             A sanitized equation
+ *
+ * @todo  Perf optimize
  */
 function sanitizeEquation(equationStr) {
 
@@ -152,8 +154,8 @@ function hasSurroundingParens (equationStr) {
 }
 
 /**
- * Split the equation string by operand (parentheses aware).
- * Uses String.split() if the equation contains no parentheses.
+ * Parentheses-aware String.split(). Splits the equation string by the
+ * given operand. Uses String.split() if the equation contains no parentheses.
  * @param  {String} equationStr  e.g. 1+1
  * @param  {String} operand      e.g. +
  * @return {Array}               An array of subequation strings
@@ -205,6 +207,7 @@ function parseEquation(equationStr, operands) {
 
   equationStr = equationStr || '0';
 
+  // Check for a number string
   if (!isNaN(equationStr)) {
     return new Equation(equationStr);
   }
