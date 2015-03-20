@@ -63,8 +63,6 @@ function hasBalancedParentheses (equationStr) {
  *
  * @param  {String} equationStr
  * @throws {Error}  Throws an Error if the input is invalid
- *
- * @todo  Check if parentheses are in balance
  */
 function validateEquation(equationStr) {
 
@@ -100,6 +98,7 @@ function validateEquation(equationStr) {
  *   - convert to lowercase
  *   - strip whitespace
  *   - strip repeating operands
+ *   - strip leading/trailing operands
  *   - pad decimal points with leading/trailing zeros
  *
  * @param  {String} equationStr The equation
