@@ -54,78 +54,6 @@ function hasBalancedParentheses (equationStr) {
 }
 
 /**
- * Validates a given equation string by checking if it
- *   - is missing operands [ e.g. 1+1(2+2) ]
- *   - uses decimal point incorrectly [ e.g. +.- or ).( ]
- *   - has unbalanced parentheses [ e.g (1+1)+(2*5-1)) ]
- *   - has two or more consecutive operands [ e.g. 1++1 ]
- *   - contains characters that are not numbers, decimal points, parentheses or operands
- *
- * @param  {String} equationStr
- * @throws {Error}  Throws an Error if the input is invalid
- */
-function validateEquation(equationStr) {
-
-  var invalidCharsRegexStr = '[^\\d\\.\\(\\)\\' + SO.ternary.join('\\') + SO.unary.join('') + ']';
-  var consecutiveOperandsRegexStr = '[\\' + SO.ternary.join('\\') + ']{2,}';
-  var invalidCharsRegex = new RegExp(invalidCharsRegexStr);
-  var consecutiveOperandsRegex = new RegExp(consecutiveOperandsRegexStr);
-
-  if (/\)\(/.test(equationStr)) {
-    throw new Error('Missing an operand.');
-  }
-
-  if (/\D\.\D/.test(equationStr)) {
-    throw new Error('Invalid use of the decimal point.');
-  }
-
-  if (!hasBalancedParentheses(equationStr)) {
-    throw new Error('Parentheses are not in balance.');
-  }
-
-  if (consecutiveOperandsRegex.test(equationStr)) {
-    throw new Error('Consecutive ternary operands detected.');
-  }
-
-  if (invalidCharsRegex.test(equationStr)) {
-    throw new Error('The equation contains invalid characters. Supported operands: ' + SO);
-  }
-
-}
-
-/**
- * Sanitizes/normalizes the equation string:
- *   - convert to lowercase
- *   - strip whitespace
- *   - strip repeating operands
- *   - strip leading/trailing operands
- *   - pad decimal points with leading/trailing zeros
- *
- * @param  {String} equationStr The equation
- * @return {String}             A sanitized equation
- *
- * @todo  Perf optimize
- */
-function sanitizeEquation(equationStr) {
-
-  var repeatingCharsRegex = new RegExp('([\\.\\' + SO.ternary.join('\\') + SO.unary.join('') + '])(?=\\1+)', 'g');
-  var trailingLeadingOperands = new RegExp('^[\\' + SO.ternary.join('\\') + ']+|[\\' + SO.ternary.join('\\') + SO.unary.join('') + ']+$', 'g');
-
-  return equationStr
-    .toLowerCase()
-    // Strip whitespace
-    .replace(/\s+/g, '')
-    // Strip repeating operands and decimal points (e.g. 1+++2 => 1+2)
-    .replace(repeatingCharsRegex, '')
-    // Strip leading/trailing ternary and unary operands (+1+2+abs => 1+2)
-    .replace(trailingLeadingOperands, '')
-    // Pad decimal points with zeros (leading & trailing)
-    .replace(/(\D)\.(\d)/g, function (m, p1, p2) { return p1 + '0.' + p2; })
-    .replace(/(\d)\.(\D)/g, function (m, p1, p2) { return p1 + '.0' + p2; });
-
-}
-
-/**
  * Checks if a given equation string is surrounded by parentheses
  * @param  {String}  equationStr
  * @return {Boolean}             True if the equation string is surrounded by parentheses,
@@ -133,20 +61,18 @@ function sanitizeEquation(equationStr) {
  */
 function hasSurroundingParens (equationStr) {
 
-  var length = equationStr.length;
-  var parentheses = -1;
-  var idx, char;
+  var lastCharIdx = equationStr.length - 1;
 
-  if (equationStr[0] !== '(' || equationStr[length - 1] !== ')') { return false; }
+  if (equationStr[0] !== '(' || equationStr[lastCharIdx] !== ')') { return false; }
 
   // Loop through the characters from right to left and return false if we hit
   // an opening parenthesis that matches the surrounding closing parenthesis
   // before we have reached the last character
-  for (idx = length - 1; idx--;) {
-    char = equationStr[idx];
-    if (char === '(') { parentheses++; }
-    else if (char === ')') { parentheses--; }
-    if (!parentheses && idx) { return false; }
+  var parentheses = -1, i;
+  for (i = lastCharIdx; i--;) {
+    if (equationStr[i] === ')') { parentheses--; }
+    else if (equationStr[i] === '(') { parentheses++; }
+    if (parentheses === 0 && i) { return false; }
   }
 
   return true;
@@ -237,6 +163,78 @@ function parseEquation(equationStr, operands) {
   });
 
   return new Equation(subequations, operand);
+
+}
+
+/**
+ * Validates a given equation string by checking if it
+ *   - is missing operands [ e.g. 1+1(2+2) ]
+ *   - uses decimal point incorrectly [ e.g. +.- or ).( ]
+ *   - has unbalanced parentheses [ e.g (1+1)+(2*5-1)) ]
+ *   - has two or more consecutive operands [ e.g. 1++1 ]
+ *   - contains characters that are not numbers, decimal points, parentheses or operands
+ *
+ * @param  {String} equationStr
+ * @throws {Error}  Throws an Error if the input is invalid
+ */
+function validateEquation(equationStr) {
+
+  var invalidCharsRegexStr = '[^\\d\\.\\(\\)\\' + SO.ternary.join('\\') + SO.unary.join('') + ']';
+  var consecutiveOperandsRegexStr = '[\\' + SO.ternary.join('\\') + ']{2,}';
+  var invalidCharsRegex = new RegExp(invalidCharsRegexStr);
+  var consecutiveOperandsRegex = new RegExp(consecutiveOperandsRegexStr);
+
+  if (/\)\(/.test(equationStr)) {
+    throw new Error('Missing an operand.');
+  }
+
+  if (/\D\.\D/.test(equationStr)) {
+    throw new Error('Invalid use of the decimal point.');
+  }
+
+  if (!hasBalancedParentheses(equationStr)) {
+    throw new Error('Parentheses are not in balance.');
+  }
+
+  if (consecutiveOperandsRegex.test(equationStr)) {
+    throw new Error('Consecutive ternary operands detected.');
+  }
+
+  if (invalidCharsRegex.test(equationStr)) {
+    throw new Error('The equation contains invalid characters. Supported operands: ' + SO);
+  }
+
+}
+
+/**
+ * Sanitizes/normalizes the equation string:
+ *   - convert to lowercase
+ *   - strip whitespace
+ *   - strip repeating operands
+ *   - strip leading/trailing operands
+ *   - pad decimal points with leading/trailing zeros
+ *
+ * @param  {String} equationStr The equation
+ * @return {String}             A sanitized equation
+ *
+ * @todo  Perf optimize
+ */
+function sanitizeEquation(equationStr) {
+
+  var repeatingCharsRegex = new RegExp('([\\.\\' + SO.ternary.join('\\') + SO.unary.join('') + '])(?=\\1+)', 'g');
+  var trailingLeadingOperands = new RegExp('^[\\' + SO.ternary.join('\\') + ']+|[\\' + SO.ternary.join('\\') + SO.unary.join('') + ']+$', 'g');
+
+  return equationStr
+    .toLowerCase()
+    // Strip whitespace
+    .replace(/\s+/g, '')
+    // Strip repeating operands and decimal points (e.g. 1+++2 => 1+2)
+    .replace(repeatingCharsRegex, '')
+    // Strip leading/trailing ternary and unary operands (+1+2+abs => 1+2)
+    .replace(trailingLeadingOperands, '')
+    // Pad decimal points with zeros (leading & trailing)
+    .replace(/(\D)\.(\d)/g, function (m, p1, p2) { return p1 + '0.' + p2; })
+    .replace(/(\d)\.(\D)/g, function (m, p1, p2) { return p1 + '.0' + p2; });
 
 }
 
