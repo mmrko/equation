@@ -25,6 +25,8 @@
 
 var Equation = require('./Equation');
 var SO = Equation.SUPPORTED_OPERANDS;
+var CHAR_OPENING_PARENS = 40;
+var CHAR_CLOSING_PARENS = 41;
 
 function EquationParser() {}
 
@@ -45,8 +47,8 @@ function hasBalancedParentheses (equationStr) {
   // Check that all opening/closing parens have a matching counterpart
   var parentheses = 0, i;
   for (i = equationStr.length; i--;) {
-    if (equationStr[i] === ')') { parentheses--; }
-    else if (equationStr[i] === '(') { parentheses++; }
+    if (equationStr.charCodeAt(i) === CHAR_CLOSING_PARENS) { parentheses--; }
+    else if (equationStr.charCodeAt(i) === CHAR_OPENING_PARENS) { parentheses++; }
     if (parentheses === 1) { return false; }
   }
 
@@ -63,15 +65,18 @@ function hasSurroundingParens (equationStr) {
 
   var lastCharIdx = equationStr.length - 1;
 
-  if (equationStr[0] !== '(' || equationStr[lastCharIdx] !== ')') { return false; }
+  if (
+    equationStr.charCodeAt(0) !== CHAR_OPENING_PARENS ||
+    equationStr.charCodeAt(lastCharIdx) !== CHAR_CLOSING_PARENS
+  ) { return false; }
 
   // Loop through the characters from right to left and return false if we hit
   // an opening parenthesis that matches the surrounding closing parenthesis
   // before we have reached the last character
   var parentheses = -1, i;
   for (i = lastCharIdx; i--;) {
-    if (equationStr[i] === ')') { parentheses--; }
-    else if (equationStr[i] === '(') { parentheses++; }
+    if (equationStr.charCodeAt(i) === CHAR_CLOSING_PARENS) { parentheses--; }
+    else if (equationStr.charCodeAt(i) === CHAR_OPENING_PARENS) { parentheses++; }
     if (parentheses === 0 && i) { return false; }
   }
 
@@ -97,17 +102,18 @@ function split(equationStr, operand) {
 
   var parentheses = 0;
   var subEquationStrings = [];
-  var cBegin, cEnd, char;
+  var cBegin, cEnd, char, charCode;
 
   // Loop through the characters from right to left and split the
   // equation string into subequation strings if the given operand
   // is not located within parentheses
   for (cBegin = cEnd = equationStr.length; cBegin--;) {
 
-    char = equationStr[cBegin];
+    char = equationStr[cBegin]
+    charCode = char.charCodeAt(0);
 
-    if (char === '(') { parentheses++; }
-    else if (char === ')') { parentheses--; }
+    if (charCode === CHAR_OPENING_PARENS) { parentheses++; }
+    else if (charCode === CHAR_CLOSING_PARENS) { parentheses--; }
     else if (char === operand && !parentheses) {
       subEquationStrings.unshift(equationStr.substring(cBegin + 1, cEnd));
       cEnd = cBegin;
